@@ -345,7 +345,7 @@ vw = 视口的 1/100 = 1/100 * 375 = 3.75&lt;br /&gt;
 translateY():指定对象Y轴(垂直方向)的平移
 &lt;/code&gt;&lt;/pre&gt;
 &lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;rotate（旋转）: 指定对象的 2D 旋转，需先有 &amp;lt;transform-origin&amp;gt; 属性的定义；表示旋转一定的角度。&lt;/li&gt;
+&lt;li&gt;rotate（旋转）: 指定对象的 2D 旋转，需先有&lt;transform-origin&gt;属性的定义；表示旋转一定的角度。&lt;/li&gt;
 &lt;/ol&gt;
 &lt;pre&gt;&lt;code&gt;rotate() = rotate(angle)
 rotate3d() = rotate3d(number,number,number,angle)
@@ -639,9 +639,13 @@ position + left: -9999px
 &lt;ul&gt;
 &lt;li&gt;在命令行中运行：lessc styles.less styles.css&lt;/li&gt;
 &lt;li&gt;编译成生产环境下的 css 文件：lessc -x styles.less styles.css&lt;br /&gt;
-&amp;lt;br&amp;gt; 在浏览器环境中使用 less&lt;/li&gt;
-&lt;li&gt;&amp;lt;link rel=&amp;quot;stylesheet/less&amp;quot; type=&amp;quot;text/css&amp;quot; href=&amp;quot;styles.less&amp;quot;/&amp;gt;&lt;/li&gt;
-&lt;li&gt;&amp;lt;script src=&amp;quot;&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cDovL2NkbmpzLmNsb3VkZmxhcmUuY29tL2FqYXgvbGlicy9sZXNzLmpzLzMuNS4zL2xlc3MubWluLmpz&#34;&gt;http://cdnjs.cloudflare.com/ajax/libs/less.js/3.5.3/less.min.js&lt;/span&gt;&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;&lt;/li&gt;
+&lt;br&gt;在浏览器环境中使用 less&lt;/li&gt;
+&lt;li&gt;
+&lt;link rel=&#34;stylesheet/less&#34; type=&#34;text/css&#34; href=&#34;styles.less&#34;/&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;script src=&#34;http://cdnjs.cloudflare.com/ajax/libs/less.js/3.5.3/less.min.js&#34;&gt;&lt;/script&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;sass&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#sass&#34;&gt;#&lt;/a&gt; Sass&lt;/h2&gt;
 &lt;h3 id=&#34;sass简介&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#sass简介&#34;&gt;#&lt;/a&gt; Sass 简介&lt;/h3&gt;
