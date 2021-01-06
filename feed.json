@@ -30,9 +30,9 @@
             ]
         },
         {
-            "id": "https://xqlove.xyz/bookstrap%E5%8E%9F%E7%90%86/",
-            "url": "https://xqlove.xyz/bookstrap%E5%8E%9F%E7%90%86/",
-            "title": "bookstrap原理",
+            "id": "https://xqlove.xyz/bootstrap%E5%8E%9F%E7%90%86/",
+            "url": "https://xqlove.xyz/bootstrap%E5%8E%9F%E7%90%86/",
+            "title": "bootstrap原理",
             "date_published": "2020-12-27T02:57:27.000Z",
             "content_html": "<h1 id=\"bootstrap\"><a class=\"anchor\" href=\"#bootstrap\">#</a> bootstrap</h1>\n<h2 id=\"简介\"><a class=\"anchor\" href=\"#简介\">#</a> 简介</h2>\n<ul>\n<li>用于构建响应式、移动设备优先的 web 站点</li>\n<li>一个 CSS 框架，twitter 出品，提高通用基础样式；提供基础样式、常用组件和 JS 插件</li>\n<li>简单灵活可用于架构流行的用户界面和交互接口的 html、css、javascript 工具集</li>\n<li>基于 html5、css3，具有友好的学习曲线，卓越的兼容性，响应式设计。12 列格网，样式向导文档</li>\n<li>自定义 JQ 插件，完整的类库</li>\n<li>bootstrap3.0 基于 less，bootstrap4.0 基于 sass</li>\n</ul>\n<h2 id=\"优缺点\"><a class=\"anchor\" href=\"#优缺点\">#</a> 优缺点</h2>\n<ul>\n<li>优点：CSS 代码结构合理，现成的样式可以直接用</li>\n<li>缺点：定制较为繁琐，体积大</li>\n</ul>\n<ol>\n<li>预编译 css 和 js 文件</li>\n<li>源码文件</li>\n<li>通过软件包管理</li>\n</ol>\n<ul>\n<li>npm install bootstrap</li>\n<li>yarn add bootstrap</li>\n</ul>\n<ol start=\"4\">\n<li>BootstapCDN</li>\n</ol>\n<p><strong>有一些依赖包导入需要注意顺序：JQ、Popper.js、bootstrap.js</strong></p>\n<h2 id=\"bootstrap的响应式布局\"><a class=\"anchor\" href=\"#bootstrap的响应式布局\">#</a> bootstrap 的响应式布局</h2>\n<p><img data-src=\"https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/bootstrap%E5%93%8D%E5%BA%94%E5%BC%8F%E5%8E%9F%E7%90%86.png\" alt=\"\" /></p>\n",
             "tags": [
