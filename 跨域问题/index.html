@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#FFF"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"><link rel="icon" type="image/ico" sizes="32x32" href="/images/favicon.ico"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="alternate" type="application/rss+xml" title="小贝壳" href="https://xqlove.xyz/rss.xml"><link rel="alternate" type="application/atom+xml" title="小贝壳" href="https://xqlove.xyz/atom.xml"><link rel="alternate" type="application/json" title="小贝壳" href="https://xqlove.xyz/feed.json"><link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic%7CFredericka%20the%20Great:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20JP:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20SC:300,300italic,400,400italic,700,700italic%7CInconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext"><link rel="stylesheet" href="/css/app.css?v=0.2.5"><meta name="keywords" content="基础知识扫盲"><link rel="canonical" href="https://xqlove.xyz/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/"><title>跨域问题介绍 - 项目实战 - 面试 | 小贝壳 = Blog</title><meta name="generator" content="Hexo 5.2.0"></head><body itemscope itemtype="http://schema.org/WebPage"><div id="loading"><div class="cat"><div class="body"></div><div class="head"><div class="face"></div></div><div class="foot"><div class="tummy-end"></div><div class="bottom"></div><div class="legs left"></div><div class="legs right"></div></div><div class="paw"><div class="hands left"></div><div class="hands right"></div></div></div></div><div id="container"><header id="header" itemscope itemtype="http://schema.org/WPHeader"><div class="inner"><div id="brand"><div class="pjax"><h1 itemprop="name headline">跨域问题介绍</h1><div class="meta"><span class="item" title="创建时间：2021-01-12 10:54:23"><span class="icon"><i class="ic i-calendar"></i> </span><span class="text">发表于</span> <time itemprop="dateCreated datePublished" datetime="2021-01-12T10:54:23+08:00">2021-01-12</time> </span><span class="item" title="本文字数"><span class="icon"><i class="ic i-pen"></i> </span><span class="text">本文字数</span> <span>8.2k</span> <span class="text">字</span> </span><span class="item" title="阅读时长"><span class="icon"><i class="ic i-clock"></i> </span><span class="text">阅读时长</span> <span>7 分钟</span></span></div></div></div><nav id="nav"><div class="inner"><div class="toggle"><div class="lines" aria-label="切换导航栏"><span class="line"></span> <span class="line"></span> <span class="line"></span></div></div><ul class="menu"><li class="item title"><a href="/" rel="start">小贝壳</a></li></ul><ul class="right"><li class="item theme"><i class="ic i-sun"></i></li><li class="item search"><i class="ic i-search"></i></li></ul></div></nav></div><div id="imgs" class="pjax"><ul><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/6833939bly1gipewr8iypj20zk0m8b29.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/wallhaven-83jlm1.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/2.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/6833939bly1giciryrr3rj20zk0m8nhk.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/wallhaven-0je23q.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/5.jpg"></li></ul></div></header><div id="waves"><svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/></defs><g class="parallax"><use xlink:href="#gentle-wave" x="48" y="0"/><use xlink:href="#gentle-wave" x="48" y="3"/><use xlink:href="#gentle-wave" x="48" y="5"/><use xlink:href="#gentle-wave" x="48" y="7"/></g></svg></div><main><div class="inner"><div id="main" class="pjax"><div class="article wrap"><div class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList"><i class="ic i-home"></i> <span><a href="/">首页</a></span><i class="ic i-angle-right"></i> <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%9D%A2%E8%AF%95/" itemprop="item" rel="index" title="分类于 面试"><span itemprop="name">面试</span></a><meta itemprop="position" content="1"></span><i class="ic i-angle-right"></i> <span class="current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%9D%A2%E8%AF%95/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" itemprop="item" rel="index" title="分类于 项目实战"><span itemprop="name">项目实战</span></a><meta itemprop="position" content="2"></span></div><article itemscope itemtype="http://schema.org/Article" class="post block" lang="zh-CN"><link itemprop="mainEntityOfPage" href="https://xqlove.xyz/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.jpg"><meta itemprop="name" content="小贝壳"><meta itemprop="description" content="Blog, 你一定会长成自己喜欢的模样"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="小贝壳"></span><div class="body md" itemprop="articleBody"><h1 id="多种跨域问题详解"><a class="anchor" href="#多种跨域问题详解">#</a> 多种跨域问题详解</h1><h2 id="什么是同源策略"><a class="anchor" href="#什么是同源策略">#</a> 什么是同源策略？</h2><p>同源策略是一种约定，如果没有的话浏览器很不安全，容易受到 XSS（就是一些恶意的广告什么的一直弹，花里胡哨的）等攻击，同源指的是<strong>协议＋域名 + 端口号</strong>三者相同，<strong>即使两个不同的域名指向同一个 ip 地址，也并非同源哦</strong></p><p>比如：</p><p><span class="exturl" data-url="aHR0cDovL3d3dy5kb21haW4uY29tL2EuanM=">http://www.domain.com/a.js</span><br><span class="exturl" data-url="aHR0cDovLzE5Mi4xNjguNC4xMi9iLmpz">http://192.168.4.12/b.js</span></p><p><strong>还有主域相同、子域不同也不是同源哦</strong></p><p>比如：</p><p><span class="exturl" data-url="aHR0cDovL3d3dy5kb21haW4uY29tL2EuanM=">http://www.domain.com/a.js</span><br><span class="exturl" data-url="aHR0cDovL3guZG9tYWluLmNvbS9iLmpz">http://x.domain.com/b.js</span><br><span class="exturl" data-url="aHR0cDovL2RvbWFpbi5jb20vYy5qcw==">http://domain.com/c.js</span></p><p><strong>为什么浏览器不支持跨域</strong></p><p>就是跨域会很危险，比如银行账户被盗了很有可能哦！</p><h2 id="同源策略会有哪些问题也就是不跨域会怎样呢"><a class="anchor" href="#同源策略会有哪些问题也就是不跨域会怎样呢">#</a> 同源策略会有哪些问题？（也就是不跨域会怎样呢？）</h2><ul><li>Cookie、LocalStorage 和 IndexDB 等存储内容无法读取</li><li>DOM 和 JS 对象无法获得（iframe 可以在自己的页面引入别人的页面（前提是同域））</li><li>AJAX 请求发送出去了，但是响应被浏览器拦截了，然后就是非常难受了</li></ul><h2 id="实现跨域的方法"><a class="anchor" href="#实现跨域的方法">#</a> 实现跨域的方法</h2><ul><li>jsonp</li><li>cors（纯后端提供的，最常用的，安全性高）</li><li>postMessage（两个页面之间的通信）</li><li>document.domain（同域下的但是二级域名一级域名）</li><li><span class="exturl" data-url="aHR0cDovL3dpbmRvdy5uYW1l">window.name</span></li><li>location.hash</li><li>http-proxy（反向代理）</li><li>nginx</li><li>websocket（传播速度快，平等的，没有跨域限制）</li></ul><h3 id="jsop"><a class="anchor" href="#jsop">#</a> jsop</h3><p><strong>原理：利用<script>标签没有跨域限制，通过<script>标签 src 属性，发送带有 callback 参数的 GET 请求，服务端将接口返回数据拼凑到 callback 函数中，返回给浏览器，浏览器解析执行，从而前端拿到 callback 函数返回的数据</strong></p>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"><meta name="theme-color" content="#FFF"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"><link rel="icon" type="image/ico" sizes="32x32" href="/images/favicon.ico"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="alternate" type="application/rss+xml" title="小贝壳" href="https://xqlove.xyz/rss.xml"><link rel="alternate" type="application/atom+xml" title="小贝壳" href="https://xqlove.xyz/atom.xml"><link rel="alternate" type="application/json" title="小贝壳" href="https://xqlove.xyz/feed.json"><link rel="stylesheet" href="//fonts.googleapis.com/css?family=Mulish:300,300italic,400,400italic,700,700italic%7CFredericka%20the%20Great:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20JP:300,300italic,400,400italic,700,700italic%7CNoto%20Serif%20SC:300,300italic,400,400italic,700,700italic%7CInconsolata:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext"><link rel="stylesheet" href="/css/app.css?v=0.2.5"><meta name="keywords" content="基础知识扫盲"><link rel="canonical" href="https://xqlove.xyz/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/"><title>跨域问题介绍 - 项目实战 - 面试 | 小贝壳 = Blog</title><meta name="generator" content="Hexo 5.2.0"></head><body itemscope itemtype="http://schema.org/WebPage"><div id="loading"><div class="cat"><div class="body"></div><div class="head"><div class="face"></div></div><div class="foot"><div class="tummy-end"></div><div class="bottom"></div><div class="legs left"></div><div class="legs right"></div></div><div class="paw"><div class="hands left"></div><div class="hands right"></div></div></div></div><div id="container"><header id="header" itemscope itemtype="http://schema.org/WPHeader"><div class="inner"><div id="brand"><div class="pjax"><h1 itemprop="name headline">跨域问题介绍</h1><div class="meta"><span class="item" title="创建时间：2021-01-12 10:54:23"><span class="icon"><i class="ic i-calendar"></i> </span><span class="text">发表于</span> <time itemprop="dateCreated datePublished" datetime="2021-01-12T10:54:23+08:00">2021-01-12</time> </span><span class="item" title="本文字数"><span class="icon"><i class="ic i-pen"></i> </span><span class="text">本文字数</span> <span>8.2k</span> <span class="text">字</span> </span><span class="item" title="阅读时长"><span class="icon"><i class="ic i-clock"></i> </span><span class="text">阅读时长</span> <span>7 分钟</span></span></div></div></div><nav id="nav"><div class="inner"><div class="toggle"><div class="lines" aria-label="切换导航栏"><span class="line"></span> <span class="line"></span> <span class="line"></span></div></div><ul class="menu"><li class="item title"><a href="/" rel="start">小贝壳</a></li></ul><ul class="right"><li class="item theme"><i class="ic i-sun"></i></li><li class="item search"><i class="ic i-search"></i></li></ul></div></nav></div><div id="imgs" class="pjax"><ul><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/6833939bly1giclhtuo6nj20zk0m8ttm.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/5.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/1.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/wallhaven-13xz11.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/s.jpg"></li><li class="item" data-background-image="https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/wallhaven-ymez5k.jpg"></li></ul></div></header><div id="waves"><svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/></defs><g class="parallax"><use xlink:href="#gentle-wave" x="48" y="0"/><use xlink:href="#gentle-wave" x="48" y="3"/><use xlink:href="#gentle-wave" x="48" y="5"/><use xlink:href="#gentle-wave" x="48" y="7"/></g></svg></div><main><div class="inner"><div id="main" class="pjax"><div class="article wrap"><div class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList"><i class="ic i-home"></i> <span><a href="/">首页</a></span><i class="ic i-angle-right"></i> <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%9D%A2%E8%AF%95/" itemprop="item" rel="index" title="分类于 面试"><span itemprop="name">面试</span></a><meta itemprop="position" content="1"></span><i class="ic i-angle-right"></i> <span class="current" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="/categories/%E9%9D%A2%E8%AF%95/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" itemprop="item" rel="index" title="分类于 项目实战"><span itemprop="name">项目实战</span></a><meta itemprop="position" content="2"></span></div><article itemscope itemtype="http://schema.org/Article" class="post block" lang="zh-CN"><link itemprop="mainEntityOfPage" href="https://xqlove.xyz/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="image" content="/images/avatar.jpg"><meta itemprop="name" content="小贝壳"><meta itemprop="description" content="Blog, 你一定会长成自己喜欢的模样"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="小贝壳"></span><div class="body md" itemprop="articleBody"><h1 id="多种跨域问题详解"><a class="anchor" href="#多种跨域问题详解">#</a> 多种跨域问题详解</h1><h2 id="什么是同源策略"><a class="anchor" href="#什么是同源策略">#</a> 什么是同源策略？</h2><p>同源策略是一种约定，如果没有的话浏览器很不安全，容易受到 XSS（就是一些恶意的广告什么的一直弹，花里胡哨的）等攻击，同源指的是<strong>协议＋域名 + 端口号</strong>三者相同，<strong>即使两个不同的域名指向同一个 ip 地址，也并非同源哦</strong></p><p>比如：</p><p><span class="exturl" data-url="aHR0cDovL3d3dy5kb21haW4uY29tL2EuanM=">http://www.domain.com/a.js</span><br><span class="exturl" data-url="aHR0cDovLzE5Mi4xNjguNC4xMi9iLmpz">http://192.168.4.12/b.js</span></p><p><strong>还有主域相同、子域不同也不是同源哦</strong></p><p>比如：</p><p><span class="exturl" data-url="aHR0cDovL3d3dy5kb21haW4uY29tL2EuanM=">http://www.domain.com/a.js</span><br><span class="exturl" data-url="aHR0cDovL3guZG9tYWluLmNvbS9iLmpz">http://x.domain.com/b.js</span><br><span class="exturl" data-url="aHR0cDovL2RvbWFpbi5jb20vYy5qcw==">http://domain.com/c.js</span></p><p><strong>为什么浏览器不支持跨域</strong></p><p>就是跨域会很危险，比如银行账户被盗了很有可能哦！</p><h2 id="同源策略会有哪些问题也就是不跨域会怎样呢"><a class="anchor" href="#同源策略会有哪些问题也就是不跨域会怎样呢">#</a> 同源策略会有哪些问题？（也就是不跨域会怎样呢？）</h2><ul><li>Cookie、LocalStorage 和 IndexDB 等存储内容无法读取</li><li>DOM 和 JS 对象无法获得（iframe 可以在自己的页面引入别人的页面（前提是同域））</li><li>AJAX 请求发送出去了，但是响应被浏览器拦截了，然后就是非常难受了</li></ul><h2 id="实现跨域的方法"><a class="anchor" href="#实现跨域的方法">#</a> 实现跨域的方法</h2><ul><li>jsonp</li><li>cors（纯后端提供的，最常用的，安全性高）</li><li>postMessage（两个页面之间的通信）</li><li>document.domain（同域下的但是二级域名一级域名）</li><li><span class="exturl" data-url="aHR0cDovL3dpbmRvdy5uYW1l">window.name</span></li><li>location.hash</li><li>http-proxy（反向代理）</li><li>nginx</li><li>websocket（传播速度快，平等的，没有跨域限制）</li></ul><h3 id="jsop"><a class="anchor" href="#jsop">#</a> jsop</h3><p><strong>原理：利用<script>标签没有跨域限制，通过<script>标签 src 属性，发送带有 callback 参数的 GET 请求，服务端将接口返回数据拼凑到 callback 函数中，返回给浏览器，浏览器解析执行，从而前端拿到 callback 函数返回的数据</strong></p>
 <p>首先我们写代码的时候 src 中可以引入别人家的域，从而获取别人家的数据，可以动手试试，这里就不再赘述啦。</p>
 <p>用 jsop 来实现的话就是：</p>
 <ul>
@@ -233,7 +233,7 @@ console.log('Proxy server is listen at port 3000...');
     <div class="item left">
       
 
-  <a href="/cookie%E3%80%81localStorage%E3%80%81sessionStorage/" itemprop="url" rel="prev" data-background-image="https:&#x2F;&#x2F;cloud-img-1301075855.cos.ap-chengdu.myqcloud.com&#x2F;xin&#x2F;6833939bly1giph4baakhj20zk0m8h5q.jpg" title="cookie、localStorage、sessionStorage">
+  <a href="/cookie%E3%80%81localStorage%E3%80%81sessionStorage/" itemprop="url" rel="prev" data-background-image="https:&#x2F;&#x2F;cloud-img-1301075855.cos.ap-chengdu.myqcloud.com&#x2F;xin&#x2F;2.jpg" title="cookie、localStorage、sessionStorage">
   <span class="type">上一篇</span>
   <span class="category"><i class="ic i-flag"></i> 面试</span>
   <h3>cookie、localStorage、sessionStorage</h3>
@@ -375,53 +375,22 @@ console.log('Proxy server is listen at port 3000...');
   <li class="item">
     
 <div class="breadcrumb">
-</div>
-
-    <span><a href="/hello-world/" title="Hello World">Hello World</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
 <a href="/categories/CSS/" title="分类于 CSS">CSS</a>
 <i class="ic i-angle-right"></i>
-<a href="/categories/CSS/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
+<a href="/categories/CSS/%E7%A7%BB%E5%8A%A8%E7%AB%AF/" title="分类于 移动端">移动端</a>
 </div>
 
-    <span><a href="/font-size-line-height-vertical-align/" title="font-size&amp;line-height&amp;vertical-align">font-size&line-height&vertical-align</a></span>
+    <span><a href="/CSS%E5%B8%B8%E8%A7%81%E5%8D%95%E4%BD%8D-%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%B8%83%E5%B1%80/" title="CSS常见单位&amp;移动端布局">CSS常见单位&移动端布局</a></span>
   </li>
 
       
   <li class="item">
     
 <div class="breadcrumb">
-<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
+<a href="/categories/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
 </div>
 
-    <span><a href="/CSS%E5%8A%A8%E7%94%BB/" title="CSS动画">CSS动画</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
-<i class="ic i-angle-right"></i>
-<a href="/categories/CSS/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
-</div>
-
-    <span><a href="/%E5%AE%9A%E4%BD%8D/" title="定位">定位</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
-</div>
-
-    <span><a href="/CSS%E5%B7%A5%E7%A8%8B%E5%8C%96%E5%8F%8A%E6%A1%86%E6%9E%B6%E7%AE%80%E4%BB%8B/" title="CSS工程化及框架简介">CSS工程化及框架简介</a></span>
+    <span><a href="/cookie%E3%80%81localStorage%E3%80%81sessionStorage/" title="cookie、localStorage、sessionStorage">cookie、localStorage、sessionStorage</a></span>
   </li>
 
       
@@ -434,6 +403,50 @@ console.log('Proxy server is listen at port 3000...');
 </div>
 
     <span><a href="/%E6%B0%B4%E5%B9%B3%E5%B1%85%E4%B8%AD-%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD/" title="水平居中&amp;垂直居中">水平居中&垂直居中</a></span>
+  </li>
+
+      
+  <li class="item">
+    
+<div class="breadcrumb">
+<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
+<i class="ic i-angle-right"></i>
+<a href="/categories/CSS/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
+</div>
+
+    <span><a href="/flex%E5%B8%83%E5%B1%80%E5%8F%8A%E5%BA%94%E7%94%A8/" title="flex布局及应用">flex布局及应用</a></span>
+  </li>
+
+      
+  <li class="item">
+    
+<div class="breadcrumb">
+<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
+</div>
+
+    <span><a href="/CSS%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8%E7%AE%80%E4%BB%8B/" title="CSS预处理器简介">CSS预处理器简介</a></span>
+  </li>
+
+      
+  <li class="item">
+    
+<div class="breadcrumb">
+<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
+<i class="ic i-angle-right"></i>
+<a href="/categories/CSS/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
+</div>
+
+    <span><a href="/%E4%B8%A4%E5%88%97%E5%B8%83%E5%B1%80/" title="两列布局">两列布局</a></span>
+  </li>
+
+      
+  <li class="item">
+    
+<div class="breadcrumb">
+<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
+</div>
+
+    <span><a href="/CSS%E6%A0%B8%E5%BF%83%E5%86%85%E5%AE%B9%E6%A2%B3%E7%90%86/" title="CSS核心内容大纲">CSS核心内容大纲</a></span>
   </li>
 
       
@@ -455,29 +468,16 @@ console.log('Proxy server is listen at port 3000...');
 <a href="/categories/CSS/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
 </div>
 
-    <span><a href="/%E4%B8%89%E5%88%97%E5%B8%83%E5%B1%80/" title="三列布局">三列布局</a></span>
+    <span><a href="/BFC-IFC/" title="BFC&amp;IFC">BFC&IFC</a></span>
   </li>
 
       
   <li class="item">
     
 <div class="breadcrumb">
-<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
 </div>
 
-    <span><a href="/CSS%E6%A0%B8%E5%BF%83%E5%86%85%E5%AE%B9%E6%A2%B3%E7%90%86/" title="CSS核心内容大纲">CSS核心内容大纲</a></span>
-  </li>
-
-      
-  <li class="item">
-    
-<div class="breadcrumb">
-<a href="/categories/CSS/" title="分类于 CSS">CSS</a>
-<i class="ic i-angle-right"></i>
-<a href="/categories/CSS/%E9%9D%A2%E8%AF%95/" title="分类于 面试">面试</a>
-</div>
-
-    <span><a href="/%E4%B8%A4%E5%88%97%E5%B8%83%E5%B1%80/" title="两列布局">两列布局</a></span>
+    <span><a href="/hello-world/" title="Hello World">Hello World</a></span>
   </li>
 
   </ul>
