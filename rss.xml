@@ -23,7 +23,141 @@
             <category term="网络" scheme="https://xqlove.xyz/tags/%E7%BD%91%E7%BB%9C/" />
             <category term="TCP" scheme="https://xqlove.xyz/tags/TCP/" />
             <pubDate>Fri, 29 Jan 2021 20:41:10 +0800</pubDate>
-            <description><![CDATA[  ]]></description>
+            <description><![CDATA[ &lt;h1 id=&#34;一起聊聊tcp三次握手和四次挥手吧&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#一起聊聊tcp三次握手和四次挥手吧&#34;&gt;#&lt;/a&gt; 一起聊聊 TCP 三次握手和四次挥手吧！&lt;/h1&gt;
+&lt;p&gt;这一次我们带着问题来了解一下 TCP 建立连接和断开连接的过程。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;为什么是三次握手？&lt;/li&gt;
+&lt;li&gt;三次握手过程中可以携带数据吗？&lt;/li&gt;
+&lt;li&gt;什么是半连接队列？&lt;/li&gt;
+&lt;li&gt;ISN 是固定的吗？&lt;/li&gt;
+&lt;li&gt;为什么是四次挥手？&lt;/li&gt;
+&lt;li&gt;四次挥手释放连接时，等待 2MSL 的意义？长一点短一点会有什么影响？&lt;/li&gt;
+&lt;li&gt;当有大量的 time wait 状态，导致资源浪费，怎么排查、改进？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;知识卡片&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#知识卡片&#34;&gt;#&lt;/a&gt; 知识卡片&lt;/h2&gt;
+&lt;h3 id=&#34;状态&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#状态&#34;&gt;#&lt;/a&gt; 状态&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;CLOSED：初始状态&lt;/li&gt;
+&lt;li&gt;LISTEN：表示服务器端的某个 SOCKET（套接字）处于监听状态，可以接受连接了&lt;/li&gt;
+&lt;li&gt;SYN_SENT：客户端已发送 SYN 报文&lt;/li&gt;
+&lt;li&gt;SYN_RECV：服务器端接受到了 SYN 报文&lt;/li&gt;
+&lt;li&gt;ESTABLISHED：连接已经建立&lt;/li&gt;
+&lt;li&gt;FIN_WAIT1：SOCKET 在 ESTABLISHED 状态时想主动关闭连接，向对方发送了 FIN 报文，此时该 SOCKET 即进入到 FIN_WAIT_1 状态。&lt;/li&gt;
+&lt;li&gt;CLOSE_WAIT: 这种状态的含义其实是表示在等待关闭&lt;/li&gt;
+&lt;li&gt;FIN_WAIT2：对方回应 ACK 报文后，则进入到 FIN_WAIT_2 状态，表示半连接，也即有一方要求 close 连接，但另外还告诉对方，我暂时还有点数据需要传送给你，稍后再关闭连接。&lt;/li&gt;
+&lt;li&gt;CLOSING：如果双方几乎在同时 close 一个 SOCKET 的话，那么就出现了双方同时发送 FIN 报 文的情况，也即会出现 CLOSING 状态，表示双方都正在关闭 SOCKET 连接。&lt;/li&gt;
+&lt;li&gt;LAST_ACK：被动关闭一方在发送 FIN 报文后，最后等待对方的 ACK 报文。&lt;/li&gt;
+&lt;li&gt;TIME_WAIT：客户端等待 2ML&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;标识位&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#标识位&#34;&gt;#&lt;/a&gt; 标识位&lt;/h3&gt;
+&lt;p&gt;SYN：SYN 包作为建立连接的请求等待确认应答。&lt;/p&gt;
+&lt;p&gt;序列号是按顺序给发送数据的每一个字节（8 位字节）都标上号码的编号。接收端查询接收数据 TCP 首部中的序列号和数据的长度，将下一步应该接收的序号作为确认应答返送回去（序列号 + 数据长度 = ack）。&lt;/p&gt;
+&lt;p&gt;ACK：在 TCP 中，当通过发送端的数据到达接收主机时，接收端主机会返回一个已收到消息的通知。这个消息叫做确认应答（ACK）。&lt;/p&gt;
+&lt;p&gt;NACK：这个就是一个否定确认应答，就好比别人跟你说话，你没有听清或者没太理解他的意思回答 “咦？”。一般用于 UDP 通信中，在 UDP 通信中发送端不考虑接收端是否接收到，在接收端发现丢包的时候，构造一个 NACK 消息包发送给发送端。&lt;/p&gt;
+&lt;p&gt;FIN：进行断开连接处理发送的包。&lt;/p&gt;
+&lt;p&gt;RST：重置连接。&lt;/p&gt;
+&lt;h3 id=&#34;其它&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#其它&#34;&gt;#&lt;/a&gt; 其它&lt;/h3&gt;
+&lt;p&gt;seq（消息序号）：第一次请求时，随机生成一个值，而后每次 + 1&lt;/p&gt;
+&lt;p&gt;ack（确认序号，注意是小写）：接收上一条信息的 seq+1&lt;/p&gt;
+&lt;h2 id=&#34;三次握手的过程是怎样的&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#三次握手的过程是怎样的&#34;&gt;#&lt;/a&gt; 三次握手的过程是怎样的？&lt;/h2&gt;
+&lt;p&gt;TCP 通过检验和、序列号、确认应答、重发控制、连接管理以及窗口控制等机制实现可靠性传输。&lt;/p&gt;
+&lt;p&gt;三次握手的过程如图所示：&lt;/p&gt;
+&lt;p&gt;&lt;img data-src=&#34;https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/Snipaste_2021-01-30_15-28-13.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;刚开始客户端处于 Closed 的状态，服务端处于 Listen 状态。&lt;br /&gt;
+进行三次握手：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;第一次握手：不可以携带数据，数据长度为 0，要消耗一个序列号，原因是需要对端确认。此时服务器端可以确实自己可以接受客户端发送的报文。此时客户端处于  &lt;code&gt;SYN_SEND&lt;/code&gt;  状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第二次握手：客户端可以确认服务器端收到了自己发送的报文，并且可以确认自己可以接收服务器端发送的报文。分配服务器端资源。此时服务器处于  &lt;code&gt;SYN_RCVD&lt;/code&gt;  的状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第三次握手：服务器端可以确认客户端接收服务器端发送的报文。只有第三次握手允许携带数据。分配客户端资源。此时客户端处于  &lt;code&gt;ESTABLISHED&lt;/code&gt;  状态，服务器收到 ACK 报文之后，也处于  &lt;code&gt;ESTABLISHED&lt;/code&gt;  状态，此时，双方已建立起了连接。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;简单来说就是：客户端第一次发送，证明客户端的发送能力正常；服务器第一次接收并发送，证明服务器端接收、发送能力正常；客户端第二次发送，证明客户端的接收能力正常。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;为什么需要三次握手&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#为什么需要三次握手&#34;&gt;#&lt;/a&gt; 为什么需要三次握手？&lt;/h2&gt;
+&lt;p&gt;需要三次握手才能确认双方的接收与发送能力是否正常。&lt;/p&gt;
+&lt;p&gt;如客户端发出连接请求，但因连接请求报文丢失而未收到确认，于是客户端再重传一次连接请求。后来收到了确认，建立了连接。数据传输完毕后，就释放了连接，客户端共发出了两个连接请求报文段，其中第一个丢失，第二个到达了服务端，但是第一个丢失的报文段只是在&lt;strong&gt;某些网络结点长时间滞留了，延误到连接释放以后的某个时间才到达服务端&lt;/strong&gt;，此时服务端误认为客户端又发出一次新的连接请求，于是就向客户端发出确认报文段，同意建立连接，不采用三次握手，只要服务端发出确认，就建立新的连接了，此时客户端忽略服务端发来的确认，也不发送数据，则服务端一致等待客户端发送数据，浪费资源。&lt;/p&gt;
+&lt;p&gt;在掘金上看到的这么一段话，反复的读了好几遍，前面也写了三次握手都有哪些作用。我的理解就是三次握手可以避免连接资源的浪费，不会因为一些特殊情况打开连接，避免 DDOS 攻击。&lt;/p&gt;
+&lt;h2 id=&#34;三次握手过程中可以携带数据吗&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#三次握手过程中可以携带数据吗&#34;&gt;#&lt;/a&gt; 三次握手过程中可以携带数据吗？&lt;/h2&gt;
+&lt;p&gt;第一二次不可以，第三次可以，因为第三次才成功建立连接，如果第一、二次携带数据很容易造成 SYN 攻击，就是在握手时传入大量的数据，不理睬服务器端能力是否正常，疯狂发送 SYN，导致资源浪费。类似拒绝服务攻击。&lt;/p&gt;
+&lt;p&gt;SYN 攻击的解决办法：SYN Cookie 算法、缩短超时时间&lt;/p&gt;
+&lt;p&gt;有兴趣深入了解更多攻击技术和防御方法的朋友们，可以阅读这篇文章。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://xqlove.xyz/Web%E5%AE%89%E5%85%A8/&#34;&gt;Web 安全&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;什么是半连接队列什么是全连接队列&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#什么是半连接队列什么是全连接队列&#34;&gt;#&lt;/a&gt; 什么是半连接队列？什么是全连接队列？&lt;/h2&gt;
+&lt;p&gt;服务器第一次收到客户端的 SYN 之后，就会处于 SYN_RCVD 状态，此时双方还没有完全建立其连接，服务器会把此种状态下请求连接放在一个&lt;strong&gt;队列&lt;/strong&gt;里，我们把这种队列称之为&lt;strong&gt;半连接队列&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;当然还有一个&lt;strong&gt;全连接队列&lt;/strong&gt;，就是已经完成三次握手，建立起连接的就会放在全连接队列中。如果队列满了就有可能会出现丢包现象&lt;/p&gt;
+&lt;h2 id=&#34;isn是固定的吗&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#isn是固定的吗&#34;&gt;#&lt;/a&gt; ISN 是固定的吗？&lt;/h2&gt;
+&lt;p&gt;当一端发送 SYN 时，它为连接选择一个初始序号。ISN 随时间而变化，因此每个连接都将具有不同的 ISN。ISN 可以看作是一个 32 比特的计数器，每 4ms 加 1 。这样选择序号的目的在于防止在网络中被延迟的分组在以后又被传送，而导致某个连接的一方对它做错误的解释。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;三次握手的其中一个重要功能是客户端和服务端交换 ISN (Initial Sequence Number)，以便让对方知道接下来接收数据的时候如何按序列号组装数据。如果 ISN 是固定的，攻击者很容易猜出后续的确认号，因此 ISN 是动态生成的&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;四次挥手的过程是怎样的&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#四次挥手的过程是怎样的&#34;&gt;#&lt;/a&gt; 四次挥手的过程是怎样的？&lt;/h2&gt;
+&lt;p&gt;&lt;img data-src=&#34;https://cloud-img-1301075855.cos.ap-chengdu.myqcloud.com/xin/Snipaste_2021-01-30_18-38-48.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;挥手前主动释放连接的客户端结束 ESTABLISHED 阶段，然后开始四次挥手。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;第一次挥手：客户端想要释放连接，向服务器端发送 TCP 报文，随后客户端进入 FIN-WAIT-1 阶段，也就是半关闭状态，停止客户端向服务器方向上发送数据，但是客户端仍然能接收从服务器端传输过来的数据。&lt;/p&gt;
+&lt;p&gt;这里不发送的是数据，但是可以发送确认报文。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第二次挥手：服务器端接收到客户端发出的报文后，确认客户端想要释放连接，随后服务器端结束 ESTABLISHED 阶段，进入 CLOSE-WAIT 阶段（半关闭状态）并返回一段 TCP 报文，服务器端开始准备释放服务器端到客户端方向上的连接。客户端收到报文后，确认了服务器收到了客户端发出的释放连接请求，结束 FIN-WAIT-1 阶段，进入 FIN-WAIT-2 阶段。&lt;/p&gt;
+&lt;p&gt;两次挥手后，服务器端知道了客户端想要释放连接，客户端知道了服务器端了解了自己的想法，于是可以关闭客户端到服务器端方向上的连接了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第三次挥手：服务器端经过 CLOSED-WAIT 阶段，做好了释放服务器端到客户端方向上的连接准备，再次向客户端发送报文，随后结束 CLOSE-WAIT 阶段，进入 LAST-ACK 阶段，停止向客户端发送数据，但是仍然可以接收从客户端传输过来的数据。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;第四次挥手：客户端收到从服务器端发出的报文，确认了服务器端已做好释放连接的准备，结束 FIN-WAIT-2 阶段，进入 TIME-WAIT 阶段，并向服务器端发送一段报文。&lt;/p&gt;
+&lt;p&gt;随后客户端开始在 TIME-WAIT 阶段等待 2MSL。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;为什么是四次挥手&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#为什么是四次挥手&#34;&gt;#&lt;/a&gt; 为什么是四次挥手？&lt;/h2&gt;
+&lt;p&gt;终止一个连接要经过四次挥手。这是 TCP 的&lt;strong&gt;半关闭&lt;/strong&gt;（half-close）造成的。所谓的半关闭，其实就是 TCP 提供了连接的一端在结束它的发送后还能接收来自另一端数据的能力。&lt;/p&gt;
+&lt;p&gt;因为当服务端收到客户端的 SYN 连接请求报文后，可以直接发送 SYN+ACK 报文。其中&lt;strong&gt; ACK 报文是用来应答的，SYN 报文是用来同步的&lt;/strong&gt;。但是关闭连接时，当服务端收到 FIN 报文时，很可能并不会立即关闭 SOCKET，所以只能先回复一个 ACK 报文，告诉客户端，&amp;quot;你发的 FIN 报文我收到了&amp;quot;。只有等到我服务端所有的报文都发送完了，我才能发送 FIN 报文，因此不能一起发送。&lt;/p&gt;
+&lt;h2 id=&#34;四次挥手释放连接时等待2msl的意义长一点短一点会有什么影响&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#四次挥手释放连接时等待2msl的意义长一点短一点会有什么影响&#34;&gt;#&lt;/a&gt; 四次挥手释放连接时，等待 2MSL 的意义？长一点短一点会有什么影响？&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;2 个 MSL (Maximum Segment Lifetime，报文最大生存时间), 在这段时间内如果客户端没有收到服务端的重发请求，那么表示 ACK 成功到达，挥手结束，否则客户端重发 ACK。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;如果不等待，客户端直接跑路，当服务端还有很多数据包要给客户端发，且还在路上的时候，若客户端的端口此时刚好被新的应用占用，那么就接收到了无用数据包，造成数据包混乱。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;1 个 MSL 确保四次挥手中主动关闭方最后的 ACK 报文最终能达到对端&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;1 个 MSL 确保对端没有收到 ACK 重传的 FIN 报文可以到达&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;当有大量的time-wait2ml状态导致资源浪费怎么排查-改进&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#当有大量的time-wait2ml状态导致资源浪费怎么排查-改进&#34;&gt;#&lt;/a&gt; 当有大量的 TIME-WAIT（2ML）状态，导致资源浪费，怎么排查、改进？&lt;/h2&gt;
+&lt;p&gt;TIME_WAIT 状态之所以存在，是为了保证网络的可靠性。&lt;/p&gt;
+&lt;h3 id=&#34;time_wait产生需要的条件&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#time_wait产生需要的条件&#34;&gt;#&lt;/a&gt; TIME_WAIT 产生需要的条件:&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;高并发（可以让服务器在短时间范围内同时占用大量端口）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务器主动关闭连接&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;产生大量time_wait状态的解决办法&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#产生大量time_wait状态的解决办法&#34;&gt;#&lt;/a&gt; 产生大量 TIME_WAIT 状态的解决办法：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;服务器不主动关闭连接&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;减少短连接次数&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;增加客户端 IP (一般客户端 IP 少都是通过应用层的负载均衡到达服务器的)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;设置允许地址重用，这样每次 bind 的时候，如果五元组正在使用，bind 就会把五元组抢过来 (不安全）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;strong&gt;参考文献&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;《图解 TCP/IP》第 5 版。&lt;/p&gt;
+&lt;p&gt;作者：猿人谷链接：&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly9qdWVqaW4uY24vcG9zdC82ODQ0OTAzOTU4NjI0ODc4NjA2JUU2JTlEJUE1JUU2JUJBJTkwJUVGJUJDJTlBJUU2JThFJTk4JUU5JTg3JTkxJUU4JTkxJTk3JUU0JUJEJTlDJUU2JTlEJTgzJUU1JUJEJTkyJUU0JUJEJTlDJUU4JTgwJTg1JUU2JTg5JTgwJUU2JTlDJTg5JUUzJTgwJTgy&#34;&gt;https://juejin.cn/post/6844903958624878606 来源：掘金著作权归作者所有。&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;博客园：&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly93d3cuY25ibG9ncy5jb20veWluYmlhby9wLzEwOTQ1ODM2Lmh0bWw=&#34;&gt;https://www.cnblogs.com/yinbiao/p/10945836.html&lt;/span&gt;&lt;/p&gt;
+ ]]></description>
         </item>
         <item>
             <guid isPermalink="true">https://xqlove.xyz/%E8%B7%A8%E5%9F%9F%E9%97%AE%E9%A2%98%E8%AF%A6%E8%A7%A3/</guid>
@@ -33,6 +167,7 @@
             <category term="面试" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/%E9%9D%A2%E8%AF%95/" />
             <category term="基础知识扫盲" scheme="https://xqlove.xyz/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%89%AB%E7%9B%B2/" />
             <category term="网络" scheme="https://xqlove.xyz/tags/%E7%BD%91%E7%BB%9C/" />
+            <category term="跨域" scheme="https://xqlove.xyz/tags/%E8%B7%A8%E5%9F%9F/" />
             <pubDate>Thu, 28 Jan 2021 21:13:30 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;跨域问题详解&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#跨域问题详解&#34;&gt;#&lt;/a&gt; 跨域问题详解&lt;/h1&gt;
 &lt;h2 id=&#34;什么是同源策略&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#什么是同源策略&#34;&gt;#&lt;/a&gt; 什么是同源策略？&lt;/h2&gt;
@@ -189,6 +324,8 @@ server &amp;#123;
             <title>Web安全</title>
             <link>https://xqlove.xyz/Web%E5%AE%89%E5%85%A8/</link>
             <category term="网络" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/" />
+            <category term="XSS攻击" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/XSS%E6%94%BB%E5%87%BB/" />
+            <category term="CSRF攻击" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/XSS%E6%94%BB%E5%87%BB/CSRF%E6%94%BB%E5%87%BB/" />
             <category term="基础知识扫盲" scheme="https://xqlove.xyz/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%89%AB%E7%9B%B2/" />
             <category term="网络" scheme="https://xqlove.xyz/tags/%E7%BD%91%E7%BB%9C/" />
             <pubDate>Thu, 28 Jan 2021 13:33:13 +0800</pubDate>
@@ -341,7 +478,7 @@ server &amp;#123;
 &lt;h2 id=&#34;什么是ddos&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#什么是ddos&#34;&gt;#&lt;/a&gt; 什么是 DDOS？&lt;/h2&gt;
 &lt;p&gt;DDOS 又称为分布式拒绝服务，DDOS 本是利用合理的请求造成资源过载，导致服务不可用。当访问数量达到上线后，会形成 “僵尸网络”。&lt;/p&gt;
 &lt;p&gt;我们都了解 TCP 三次握手的过程，如果不了解的话，可以看看这篇文章。&lt;/p&gt;
-&lt;p&gt;&lt;span style=&#34;color:red&#34;&gt;!!!&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://xqlove.xyz/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/&#34;&gt;TCP 三次握手和四次挥手&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;攻击者在 TCP 建立连接时会大量发送伪造源地址的 SYN 请求，服务器会消耗非常多的资源 (CPU 和内存）来处理这种半连接，同时还要对这些 IP 进行 SYN+ACK 重试。最后的结果是服务器无暇理财正常的连接请求，导致拒绝服务。&lt;/p&gt;
 &lt;h2 id=&#34;解决方法&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#解决方法&#34;&gt;#&lt;/a&gt; 解决方法&lt;/h2&gt;
 &lt;h4 id=&#34;采用syn-cookie等算法&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#采用syn-cookie等算法&#34;&gt;#&lt;/a&gt; 采用 SYN Cookie 等算法&lt;/h4&gt;
@@ -449,6 +586,7 @@ server &amp;#123;
             <title>图解http</title>
             <link>https://xqlove.xyz/%E5%9B%BE%E8%A7%A3http/</link>
             <category term="网络" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/" />
+            <category term="http" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/http/" />
             <category term="基础知识扫盲" scheme="https://xqlove.xyz/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%89%AB%E7%9B%B2/" />
             <category term="网络" scheme="https://xqlove.xyz/tags/%E7%BD%91%E7%BB%9C/" />
             <pubDate>Fri, 08 Jan 2021 09:22:01 +0800</pubDate>
@@ -572,7 +710,8 @@ server &amp;#123;
 &lt;p&gt;TCP：面向有连接的、可靠的流协议，并具备顺序控制、重发控制等机制，也就是说可以确保发送的顺序，但还是犹如没有任何间隔的数据流发送给客户端。&lt;/p&gt;
 &lt;p&gt;UDP：面向无连接的、可以确保发送信息的大小，但是不能确保信息一定能到达，如何在传输的过程中顺序打乱或者丢失是无法处理的，主要用于那些对高速传输且实时性要求较高的通信或广播。&lt;/p&gt;
 &lt;h2 id=&#34;tcp三次握手和四次挥手&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#tcp三次握手和四次挥手&#34;&gt;#&lt;/a&gt; TCP 三次握手和四次挥手&lt;/h2&gt;
-&lt;p&gt;&lt;span style=&#34;color:red&#34;&gt;专门的文章去讲解&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;由于这篇文章详细的讲解了 TCP 三次握手和四次挥手的过程，以及一些需要注意的问题，这里就不再赘述了，感兴趣的小伙伴们可以看看这篇文章。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://xqlove.xyz/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E5%92%8C%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/TCP&#34;&gt;TCP 三次握手和四次挥手&lt;/a&gt;&lt;/p&gt;
 &lt;h1 id=&#34;http10http1xhttp20&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#http10http1xhttp20&#34;&gt;#&lt;/a&gt; HTTP1.0/HTTP1.x/HTTP2.0&lt;/h1&gt;
 &lt;p&gt;HTTP 协议是不保存状态的，比如商城的登录状态保持，也就是单点登录，我们需要借助 cookie（用户识别和状态管理）来实现。&lt;/p&gt;
 &lt;p&gt;如图所示：&lt;/p&gt;
