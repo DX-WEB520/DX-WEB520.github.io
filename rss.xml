@@ -324,10 +324,10 @@ server &amp;#123;
             <title>Web安全</title>
             <link>https://xqlove.xyz/Web%E5%AE%89%E5%85%A8/</link>
             <category term="网络" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/" />
-            <category term="XSS攻击" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/XSS%E6%94%BB%E5%87%BB/" />
-            <category term="CSRF攻击" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/XSS%E6%94%BB%E5%87%BB/CSRF%E6%94%BB%E5%87%BB/" />
             <category term="基础知识扫盲" scheme="https://xqlove.xyz/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%89%AB%E7%9B%B2/" />
             <category term="网络" scheme="https://xqlove.xyz/tags/%E7%BD%91%E7%BB%9C/" />
+            <category term="XSS攻击" scheme="https://xqlove.xyz/tags/XSS%E6%94%BB%E5%87%BB/" />
+            <category term="CSRF攻击" scheme="https://xqlove.xyz/tags/CSRF%E6%94%BB%E5%87%BB/" />
             <pubDate>Thu, 28 Jan 2021 13:33:13 +0800</pubDate>
             <description><![CDATA[ &lt;h1 id=&#34;我了解的web安全&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#我了解的web安全&#34;&gt;#&lt;/a&gt; 我了解的 Web 安全&lt;/h1&gt;
 &lt;p&gt;​        刚开始不知道这个部分应该拟一个什么样的题目比较合适，这部分是书中我的安全世界观讲述的内容，想来想去觉得这部分也应该写出来，我从作者的角度，了解了 Web 安全的发展和一点点皮毛，写出来给大家扫扫盲。&lt;/p&gt;

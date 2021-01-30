@@ -493,10 +493,10 @@ server &amp;#123;
 &lt;p&gt;​&lt;/p&gt;
 </content>
         <category term="网络" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/" />
-        <category term="XSS攻击" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/XSS%E6%94%BB%E5%87%BB/" />
-        <category term="CSRF攻击" scheme="https://xqlove.xyz/categories/%E7%BD%91%E7%BB%9C/XSS%E6%94%BB%E5%87%BB/CSRF%E6%94%BB%E5%87%BB/" />
         <category term="基础知识扫盲" scheme="https://xqlove.xyz/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E6%89%AB%E7%9B%B2/" />
         <category term="网络" scheme="https://xqlove.xyz/tags/%E7%BD%91%E7%BB%9C/" />
+        <category term="XSS攻击" scheme="https://xqlove.xyz/tags/XSS%E6%94%BB%E5%87%BB/" />
+        <category term="CSRF攻击" scheme="https://xqlove.xyz/tags/CSRF%E6%94%BB%E5%87%BB/" />
         <updated>2021-01-28T05:33:13.000Z</updated>
     </entry>
     <entry>
